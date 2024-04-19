@@ -3,11 +3,13 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { VpcTestStack } from '../lib/vpc-test-stack';
 import { SagemakerStudioStack } from '../lib/SageMakerStack';
-import { UserPool } from '../lib/Cognito'; // Import the 'Cognito' class from the correct module
+import { UserPool } from '../lib/Cognito';
+import { KinesisFirehoseStream } from '../lib/KinesisFirehoseStream';
 
 const app = new cdk.App();
 // new VpcTestStack(app, 'VpcTestStack', {});
-new UserPool(app, 'UserPool', {});
+// new UserPool(app, 'UserPool', {});
+new KinesisFirehoseStream(app, 'Test-KinesisFirehoseStream', {});
 
 // new SagemakerStudioStack(app, 'SageMakerStack', {
 //   /* If you don't specify 'env', this stack will be environment-agnostic.
