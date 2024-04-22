@@ -1,7 +1,11 @@
 import * as cdk from 'aws-cdk-lib';
 import { CfnOutput } from 'aws-cdk-lib';
-import * as cognito from 'aws-cdk-lib/aws-cognito';
 import { Construct } from 'constructs';
+import { Runtime } from 'aws-cdk-lib/aws-lambda';
+import * as cognito from 'aws-cdk-lib/aws-cognito';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { Role, ServicePrincipal, Policy, PolicyStatement, Effect, AnyPrincipal } from 'aws-cdk-lib/aws-iam';
+import { join } from 'path';
 
 export interface CognitoProps {
   /**
@@ -30,8 +34,49 @@ export class UserPool extends cdk.Stack {
       }
     });
 
-    const { userPoolId } = userPool;
+    // // Define the IAM role for Cognito
+    // const cognitoRole = new Role(this, 'CognitoRole', {
+    //   assumedBy: new ServicePrincipal('cognito-idp.amazonaws.com'),
+    // });
 
+    // // provide permissions to the role to link the provider to the user pool 
+    // cognitoRole.attachInlinePolicy( new Policy(this, 'CognitoPolicy', {
+    //   statements: [
+    //     new PolicyStatement({
+    //       effect: Effect.ALLOW,
+    //       actions: ['cognito-idp:adminLinkProviderForUser'],
+    //       resources: [userPool.userPoolArn],
+    //       principals: [new AnyPrincipal()], // allow access to all authenticated users
+    //     }),
+    //   ],
+    // }));
+
+    // Define the IAM role for the Lambda function
+    // const lambdaRole = new Role(this, 'MyLambdaFunctionRole', {
+    //   assumedBy: new ServicePrincipal('lambda.amazonaws.com'), // Lambda service principal
+    // });
+
+    // Provide permissions to the role to link the provider to the user pool
+    // lambdaRole.addToPolicy(new PolicyStatement({
+    //   effect: Effect.ALLOW,
+    //   actions: ['cognito-idp:adminLinkProviderForUser'],
+    //   resources: [userPool.userPoolArn],
+    //   principals: [new AnyPrincipal()], // Allow access to all authenticated users
+    // }));
+
+    // Create a Lambda function
+    // const myLambdaFunction = new NodejsFunction(this, 'MyLambdaFunction', {
+    //   runtime: Runtime.NODEJS_18_X,
+    //   handler: 'main',
+    //   entry: join(__dirname, `/../src/lambda.ts`),
+    //   // code: lambda.Code.fromAsset('lambda'), // Assuming your Lambda code is in a directory named 'lambda'
+    //   role: lambdaRole, // Pass the role to the Lambda function
+    // });
+
+    // Add Lambda function as a trigger to the Cognito User Pool
+    // userPool.addTrigger(cognito.UserPoolOperation.PRE_SIGN_UP, myLambdaFunction);
+
+    const { userPoolId } = userPool;
     const standardCognitoWriteAttributes = [
       'address',
       'birthdate',
