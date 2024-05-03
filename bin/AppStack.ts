@@ -8,8 +8,8 @@ import { KinesisFirehoseStream } from '../lib/KinesisFirehoseStream';
 
 const app = new cdk.App();
 // new VpcTestStack(app, 'VpcTestStack', {});
-// new UserPool(app, 'UserPool', {});
-new KinesisFirehoseStream(app, 'Test-KinesisFirehoseStream', {});
+new UserPool(app, 'UserPool', {});
+// new KinesisFirehoseStream(app, 'Test-KinesisFirehoseStream', {});
 
 // new SagemakerStudioStack(app, 'SageMakerStack', {
 //   /* If you don't specify 'env', this stack will be environment-agnostic.

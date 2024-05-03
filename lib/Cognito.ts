@@ -25,14 +25,24 @@ export class UserPool extends cdk.Stack {
      const { stackName } = cdk.Stack.of(this);
     const exportPrefixResolved = exportPrefix || stackName;
 
+    const lambdaFunction = new NodejsFunction(this, 'PreSignUpLambda', {
+      runtime: Runtime.NODEJS_16_X,
+      handler: 'main',
+      entry: join(__dirname, `../src/LinkProviderToUser.ts`),
+    });
+
     const userPool = new cognito.UserPool(this, 'seiska', {
       deletionProtection: true,
       userPoolName: 'seiska',
       customAttributes: {
         postal_code: new cognito.NumberAttribute({ mutable: true}),
         terms_accepted: new cognito.BooleanAttribute({ mutable: true }),
-      }
+      },
+      lambdaTriggers: {
+        preSignUp: lambdaFunction,
+      },
     });
+    // userPool.addTrigger(cognito.UserPoolOperation.PRE_SIGN_UP, lambdaFunction);
 
     // // Define the IAM role for Cognito
     // const cognitoRole = new Role(this, 'CognitoRole', {
