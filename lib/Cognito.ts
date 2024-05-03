@@ -42,24 +42,19 @@ export class UserPool extends cdk.Stack {
         preSignUp: lambdaFunction,
       },
     });
+
+    // Attach inline policy to the lambda function
+    lambdaFunction.role!.attachInlinePolicy(new Policy(this, 'LambdaPolicy', {
+      statements: [
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: ['cognito-idp:adminLinkProviderForUser', 'cognito-idp:ListUsers'],
+          resources: [userPool.userPoolArn],
+        }),
+      ],
+    }));
+
     // userPool.addTrigger(cognito.UserPoolOperation.PRE_SIGN_UP, lambdaFunction);
-
-    // // Define the IAM role for Cognito
-    // const cognitoRole = new Role(this, 'CognitoRole', {
-    //   assumedBy: new ServicePrincipal('cognito-idp.amazonaws.com'),
-    // });
-
-    // // provide permissions to the role to link the provider to the user pool 
-    // cognitoRole.attachInlinePolicy( new Policy(this, 'CognitoPolicy', {
-    //   statements: [
-    //     new PolicyStatement({
-    //       effect: Effect.ALLOW,
-    //       actions: ['cognito-idp:adminLinkProviderForUser'],
-    //       resources: [userPool.userPoolArn],
-    //       principals: [new AnyPrincipal()], // allow access to all authenticated users
-    //     }),
-    //   ],
-    // }));
 
     // Define the IAM role for the Lambda function
     // const lambdaRole = new Role(this, 'MyLambdaFunctionRole', {
@@ -73,18 +68,6 @@ export class UserPool extends cdk.Stack {
     //   resources: [userPool.userPoolArn],
     //   principals: [new AnyPrincipal()], // Allow access to all authenticated users
     // }));
-
-    // Create a Lambda function
-    // const myLambdaFunction = new NodejsFunction(this, 'MyLambdaFunction', {
-    //   runtime: Runtime.NODEJS_18_X,
-    //   handler: 'main',
-    //   entry: join(__dirname, `/../src/lambda.ts`),
-    //   // code: lambda.Code.fromAsset('lambda'), // Assuming your Lambda code is in a directory named 'lambda'
-    //   role: lambdaRole, // Pass the role to the Lambda function
-    // });
-
-    // Add Lambda function as a trigger to the Cognito User Pool
-    // userPool.addTrigger(cognito.UserPoolOperation.PRE_SIGN_UP, myLambdaFunction);
 
     const { userPoolId } = userPool;
     const standardCognitoWriteAttributes = [
