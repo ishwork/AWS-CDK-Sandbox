@@ -111,7 +111,7 @@ export class DataCollectionApi extends Stack {
             "Records": [
               #foreach($elem in $input.path('$'))
               {
-                "Data": "$util.base64Encode($elem.category + ',' + $elem.timestamp)",
+                "Data": "$util.base64Encode($input.json('$'))",
                 "PartitionKey": "$elem.category"
               }#if($foreach.hasNext),#end
               #end
