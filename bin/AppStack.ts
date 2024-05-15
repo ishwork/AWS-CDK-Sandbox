@@ -6,12 +6,14 @@ import { SagemakerStudioStack } from '../lib/SageMakerStack';
 import { UserPool } from '../lib/Cognito';
 import { KinesisFirehoseStream } from '../lib/KinesisFirehoseStream';
 import { DataCollectionApi } from '../lib/DataCollectionApi';
+import { SimpleEmailService } from '../lib/SES';
 
 const app = new cdk.App();
 // new VpcTestStack(app, 'VpcTestStack', {});
 // new UserPool(app, 'UserPool', {});
 // new KinesisFirehoseStream(app, 'Test-KinesisFirehoseStream', {});
-new DataCollectionApi(app, 'DataCollectionApi', {});
+// new DataCollectionApi(app, 'DataCollectionApi', {});
+new SimpleEmailService(app, 'TestSimpleEmailService', {});
 
 // new SagemakerStudioStack(app, 'SageMakerStack', {
 //   /* If you don't specify 'env', this stack will be environment-agnostic.
