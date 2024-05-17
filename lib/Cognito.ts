@@ -4,7 +4,8 @@ import { Construct } from 'constructs';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
-import { Role, ServicePrincipal, Policy, PolicyStatement, Effect, AnyPrincipal } from 'aws-cdk-lib/aws-iam';
+import { CfnServiceLinkedRole, Role, ServicePrincipal, Policy, PolicyStatement, Effect, PolicyDocument, CfnPolicy  } from 'aws-cdk-lib/aws-iam';
+import { aws_pinpoint as pinpoint } from 'aws-cdk-lib';
 import { join } from 'path';
 
 export interface CognitoProps {
@@ -98,6 +99,62 @@ export class UserPool extends cdk.Stack {
       'phone_number_verified',
     ];
 
+  // Create a Pinpoint project
+    const pinpointProject = new pinpoint.CfnApp(this, 'MyCfnApp', {
+    name: 'TestProject',
+    });
+
+    // Create service-linked role for Amazon Cognito to interact with Amazon Pinpoint
+    // const serviceLinkedRole = new CfnServiceLinkedRole(this, 'CognitoPinpointRole', {
+    //   awsServiceName: 'cognito-idp.amazonaws.com',
+    //   description: 'Service linked role for Amazon Cognito to interact with Amazon Pinpoint',
+    //   customSuffix: 'CognitoServiceLinkedRole',
+    // });
+
+    // // Create a role that Amazon Cognito can assume
+    const cognitoPinpointRole = new Role(this, 'ServiceLinkedRoleForCognitoIdp', {
+      assumedBy: new ServicePrincipal('cognito-idp.amazonaws.com'),
+      description: 'Role for Amazon Cognito to interact with Amazon Pinpoint',
+    });
+
+    // // Define IAM policy statements for Amazon Pinpoint and Cognito
+    const pinpointPolicyStatement = new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions: ['mobiletargeting:UpdateEndpoint', 'mobiletargeting:PutEvents'],
+      resources: [pinpointProject.attrArn], // Adjust resource ARN as needed
+    });
+
+    const cognitoPolicyStatement = new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions: ['cognito-idp:Describe*'],
+      resources: ['*'], // Adjust resource ARN as needed
+    });
+
+    // // Find the existing service-linked role
+    // // const CognitoServiceLinkedRole = Role.fromRoleArn(this, 'CognitoServiceLinkedRole', 'arn:aws:iam::124768067502:role/aws-service-role/cognito-idp.amazonaws.com/AWSServiceRoleForAmazonCognitoIdp');
+
+    // // Attach the policy to the role
+    cognitoPinpointRole.attachInlinePolicy(new Policy(this, 'PinpointPolicy', {
+      statements: [pinpointPolicyStatement, cognitoPolicyStatement],
+    }));
+
+    // Create and add policy to the role
+    // new Policy(this, 'CognitoPinpointPolicy', {
+    //   statements: [
+    //     pinpointPolicyStatement,
+    //     cognitoPolicyStatement
+    //   ],
+    //   roles: [cognitoPinpointRole],
+    // });
+
+    const analyticsConfigurationProperty: cognito.CfnUserPoolClient.AnalyticsConfigurationProperty = {
+      // applicationArn: pinpointProject.attrArn,
+      userDataShared: true,
+      applicationId: pinpointProject.ref,
+      externalId: 'cognito',
+      roleArn: cognitoPinpointRole.roleArn,
+    }; 
+
     new cognito.CfnUserPoolClient(this, 'app-client', {
       userPoolId,
       clientName: 'Seiska.fi',
@@ -115,6 +172,7 @@ export class UserPool extends cdk.Stack {
       ],
       readAttributes: standardCognitoReadAttributes,
       writeAttributes: standardCognitoWriteAttributes,
+      analyticsConfiguration: analyticsConfigurationProperty,
     });
 
     new CfnOutput(this, 'seiska-test-userpool', {
