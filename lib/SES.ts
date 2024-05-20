@@ -1,7 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { EmailIdentity, Identity, ConfigurationSet, CloudWatchDimensionSource, EmailSendingEvent, EventDestination } from 'aws-cdk-lib/aws-ses';
-import { DefaultValue } from 'aws-cdk-lib/aws-cloudwatch';
 
 export class SimpleEmailService extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {

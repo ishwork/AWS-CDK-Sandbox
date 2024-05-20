@@ -19,7 +19,7 @@ export class DataCollectionApi extends Stack {
 
     // const region = props?.env?.region || 'eu-west-1';
 
-    const streamArn = 'arn:aws:kinesis:eu-west-1:124768067502:stream/Ishwor-test-data-stream';
+    const kinesisDataStreamArn = 'arn:aws:kinesis:eu-west-1:124768067502:stream/Test-Kinesis-data-stream';
 
     // Define IAM role for API Gateway
     const dataCollectionApiRole = new Role(this, 'ApiGatewayRole', {
@@ -35,7 +35,7 @@ export class DataCollectionApi extends Stack {
         new PolicyStatement({
           effect: Effect.ALLOW,
           actions: ['kinesis:PutRecords'],
-          resources: [streamArn],
+          resources: [kinesisDataStreamArn],
         }),
       ],
     });
@@ -43,9 +43,9 @@ export class DataCollectionApi extends Stack {
     dataCollectionApiRole.attachInlinePolicy(dataCollectionApiPolicy);
 
     // Get the Kinesis Data Stream by ARN
-    const stream = kinesis.Stream.fromStreamArn(this, 'DataStream', streamArn);
+    const dataStream = kinesis.Stream.fromStreamArn(this, 'KinesisDataStream', kinesisDataStreamArn);
 
-    stream.grantWrite(dataCollectionApiRole);
+    dataStream.grantWrite(dataCollectionApiRole);
 
     // Define the API Gateway
     const dataCoolectionApi = new RestApi(this, 'DataCollectionApi', {
@@ -107,7 +107,7 @@ export class DataCollectionApi extends Stack {
         },
         requestTemplates: {
           'application/json': `{
-            "StreamName": "Ishwor-test-data-stream",
+            "StreamName": "Test-Kinesis-data-stream",
             "Records": [
               #foreach($elem in $input.path('$'))
               {

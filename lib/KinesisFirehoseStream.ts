@@ -24,12 +24,12 @@ export class KinesisFirehoseStream extends Stack {
     // Grant permission to read and write to bucket
     bucket.grantReadWrite(firehoseRole);
     
-    const dataStreamArn = 'arn:aws:kinesis:eu-west-1:124768067502:stream/Ishwor-test-data-stream';
-    const dataStream = kinesis.Stream.fromStreamArn(this, 'Ishwor-test-data-stream', dataStreamArn);
-    // const dataStream = new kinesis.Stream(this, 'Test-Kinesis-data-stream', {
-    //   streamName: 'Test-Kinesis-data-stream',
-    //   encryption: kinesis.StreamEncryption.MANAGED,
-    // });
+    // Create the Kinesis Data Stream
+    const dataStream = new kinesis.Stream(this, 'Test-Kinesis-data-stream', {
+      streamName: 'Test-Kinesis-data-stream',
+      encryption: kinesis.StreamEncryption.MANAGED,
+      shardCount: 1,
+    });
 
     // Create the IAM policy for Firehose
     const firehosePolicy = new Policy(this, 'FirehosePolicy', {
@@ -48,11 +48,18 @@ export class KinesisFirehoseStream extends Stack {
 
     // Create the Kinesis Data Firehose delivery stream
     const firehostDliverySteram = new firehose.CfnDeliveryStream(this, 'FirehoseDeliveryStream', {
-      deliveryStreamName: 'Ishwor-test-delivery-stream',
+      deliveryStreamName: 'Test-Firehose-delivery-stream',
       deliveryStreamType: "KinesisStreamAsSource",
-      s3DestinationConfiguration: {
+      extendedS3DestinationConfiguration: {
         bucketArn: bucket.bucketArn,
         roleArn: firehoseRole.roleArn,
+        prefix: 'raw/',
+        // bufferingHints: {
+        //   intervalInSeconds: 60,
+        //   sizeInMBs: 128,
+        // },
+        // compressionFormat: 'GZIP',
+        errorOutputPrefix: 'error/',
       },
       kinesisStreamSourceConfiguration: {
         kinesisStreamArn: dataStream.streamArn,
