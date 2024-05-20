@@ -4,7 +4,7 @@ import { Construct } from 'constructs';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
-import { CfnServiceLinkedRole, Role, ServicePrincipal, Policy, PolicyStatement, Effect, PolicyDocument, CfnPolicy  } from 'aws-cdk-lib/aws-iam';
+import { CfnServiceLinkedRole, Role, ServicePrincipal, Policy, PolicyStatement, Effect, PolicyDocument, CfnPolicy, ManagedPolicy  } from 'aws-cdk-lib/aws-iam';
 import { aws_pinpoint as pinpoint } from 'aws-cdk-lib';
 import { join } from 'path';
 
@@ -104,55 +104,51 @@ export class UserPool extends cdk.Stack {
     name: 'TestProject',
     });
 
-    // Create service-linked role for Amazon Cognito to interact with Amazon Pinpoint
-    // const serviceLinkedRole = new CfnServiceLinkedRole(this, 'CognitoPinpointRole', {
+    // UUID for the service-linked role
+    const externalId = 'd138492e-5030-4476-8eba-39e701bdf0d6';
+
+    // Step 1: Create the service-linked role AWSServiceRoleForAmazonCognitoIdp
+    // const cognitoServiceRole = new CfnServiceLinkedRole(this, 'AWSServiceRoleForAmazonCognitoIdp', {
     //   awsServiceName: 'cognito-idp.amazonaws.com',
-    //   description: 'Service linked role for Amazon Cognito to interact with Amazon Pinpoint',
+    //   description: 'Service-linked role for Amazon Cognito to interact with Amazon Pinpoint',
     //   customSuffix: 'CognitoServiceLinkedRole',
     // });
 
-    // // Create a role that Amazon Cognito can assume
-    const cognitoPinpointRole = new Role(this, 'ServiceLinkedRoleForCognitoIdp', {
-      assumedBy: new ServicePrincipal('cognito-idp.amazonaws.com'),
-      description: 'Role for Amazon Cognito to interact with Amazon Pinpoint',
-    });
-
-    // // Define IAM policy statements for Amazon Pinpoint and Cognito
-    const pinpointPolicyStatement = new PolicyStatement({
-      effect: Effect.ALLOW,
-      actions: ['mobiletargeting:UpdateEndpoint', 'mobiletargeting:PutEvents'],
-      resources: [pinpointProject.attrArn], // Adjust resource ARN as needed
-    });
-
-    const cognitoPolicyStatement = new PolicyStatement({
-      effect: Effect.ALLOW,
-      actions: ['cognito-idp:Describe*'],
-      resources: ['*'], // Adjust resource ARN as needed
-    });
-
-    // // Find the existing service-linked role
-    // // const CognitoServiceLinkedRole = Role.fromRoleArn(this, 'CognitoServiceLinkedRole', 'arn:aws:iam::124768067502:role/aws-service-role/cognito-idp.amazonaws.com/AWSServiceRoleForAmazonCognitoIdp');
-
-    // // Attach the policy to the role
-    cognitoPinpointRole.attachInlinePolicy(new Policy(this, 'PinpointPolicy', {
-      statements: [pinpointPolicyStatement, cognitoPolicyStatement],
-    }));
-
-    // Create and add policy to the role
-    // new Policy(this, 'CognitoPinpointPolicy', {
-    //   statements: [
-    //     pinpointPolicyStatement,
-    //     cognitoPolicyStatement
-    //   ],
-    //   roles: [cognitoPinpointRole],
+    // Define a custom IAM role for Amazon Pinpoint
+    // const pinpointRole = new Role(this, 'PinpointRole', {
+    //   assumedBy: new ServicePrincipal('pinpoint.amazonaws.com'),
+    //   externalIds: [externalId],
     // });
+
+    // Create an IAM role for Cognito to interact with Pinpoint
+    const cognitoPinpointRole = new Role(this, 'CognitoPinpointIntegrationRole', {
+      assumedBy: new ServicePrincipal('cognito-idp.amazonaws.com'),
+      description: 'Custom role for Amazon Cognito to interact with Amazon Pinpoint',
+      externalIds: [externalId],
+      inlinePolicies: {
+        'Policy': new PolicyDocument({
+          statements: [
+            new PolicyStatement({
+              effect: Effect.ALLOW,
+              actions: ['mobiletargeting:UpdateEndpoint', 'mobiletargeting:PutEvents'],
+              resources: [pinpointProject.attrArn],
+            }),
+            new PolicyStatement({
+              effect: Effect.ALLOW,
+              actions: ['cognito-idp:Describe*'],
+              resources: ['*'],
+            }),
+          ],
+        }),
+      },
+    });
 
     const analyticsConfigurationProperty: cognito.CfnUserPoolClient.AnalyticsConfigurationProperty = {
       // applicationArn: pinpointProject.attrArn,
-      userDataShared: true,
       applicationId: pinpointProject.ref,
-      externalId: 'cognito',
+      externalId: externalId,
       roleArn: cognitoPinpointRole.roleArn,
+      userDataShared: true,
     }; 
 
     new cognito.CfnUserPoolClient(this, 'app-client', {
