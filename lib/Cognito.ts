@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import { CfnOutput } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
@@ -101,11 +102,14 @@ export class UserPool extends cdk.Stack {
 
   // Create a Pinpoint project
     const pinpointProject = new pinpoint.CfnApp(this, 'MyCfnApp', {
-    name: 'TestProject',
+    name: 'TestProject1',
     });
 
-    // UUID for the service-linked role
-    const externalId = 'd138492e-5030-4476-8eba-39e701bdf0d6';
+    // Retrieve externlaId secret from Secrets Manager
+    const externalIdSecret = Secret.fromSecretNameV2(this, 'ExternalId', 'external-Id');
+
+    // UUID for the external ID
+    const externalId = externalIdSecret.secretValue.unsafeUnwrap();
 
     // Step 1: Create the service-linked role AWSServiceRoleForAmazonCognitoIdp
     // const cognitoServiceRole = new CfnServiceLinkedRole(this, 'AWSServiceRoleForAmazonCognitoIdp', {
