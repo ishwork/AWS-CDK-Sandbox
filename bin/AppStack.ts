@@ -10,8 +10,8 @@ import { SimpleEmailService } from '../lib/SES';
 
 const app = new cdk.App();
 // new VpcTestStack(app, 'VpcTestStack', {});
-// new UserPool(app, 'UserPool', {});
-new KinesisFirehoseStream(app, 'Test-KinesisFirehoseStream', {});
+new UserPool(app, 'UserPool', {});
+// new KinesisFirehoseStream(app, 'Test-KinesisFirehoseStream', {});
 // new DataCollectionApi(app, 'DataCollectionApi', {});
 // new SimpleEmailService(app, 'TestSimpleEmailService', {});
 // new SagemakerStudioStack(app, 'SageMakerStack', {

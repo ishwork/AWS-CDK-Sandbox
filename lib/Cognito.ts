@@ -33,6 +33,20 @@ export class UserPool extends cdk.Stack {
       entry: join(__dirname, `../src/LinkProviderToUser.ts`),
     });
 
+    // create a lambda function to be used as a post-authentication trigger
+    const cognitoPostAuthPinpointAnalyticsLambda = new NodejsFunction(this, 'CognitoPostAuthPinpointAnalytics', {
+      functionName: 'Test-CognitoPostAuthPinpointAnalyticsLambda',
+      memorySize: 256,
+      timeout: cdk.Duration.seconds(30),
+      runtime: Runtime.NODEJS_18_X,
+      handler: 'main',
+      entry: join(__dirname, `../src/CognitoPostAuthPinpointAnalytics.ts`),
+      environment: {
+        PINPOINT_APP_ID: cdk.SecretValue.secretsManager('Seiska-Userpool-PinpointProjectAppId').unsafeUnwrap(),
+      },
+    });
+
+
     const userPool = new cognito.UserPool(this, 'seiska', {
       deletionProtection: true,
       userPoolName: 'seiska',
@@ -45,6 +59,11 @@ export class UserPool extends cdk.Stack {
       },
     });
 
+    // Create a Pinpoint project
+    const pinpointProject = new pinpoint.CfnApp(this, 'MyCfnApp', {
+    name: 'TestProject1',
+    });
+
     // Attach inline policy to the lambda function
     lambdaFunction.role!.attachInlinePolicy(new Policy(this, 'LambdaPolicy', {
       statements: [
@@ -52,6 +71,16 @@ export class UserPool extends cdk.Stack {
           effect: Effect.ALLOW,
           actions: ['cognito-idp:adminLinkProviderForUser', 'cognito-idp:ListUsers'],
           resources: [userPool.userPoolArn],
+        }),
+      ],
+    }));
+
+    cognitoPostAuthPinpointAnalyticsLambda.role!.attachInlinePolicy(new Policy (this, 'pinpoint-policy', {
+      statements: [
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: ['mobiletargeting:UpdateEndpoint', 'mobiletargeting:PutEvents'],
+          resources: [`${pinpointProject.attrArn}/*`],
         }),
       ],
     }));
@@ -99,11 +128,6 @@ export class UserPool extends cdk.Stack {
       'email_verified',
       'phone_number_verified',
     ];
-
-  // Create a Pinpoint project
-    const pinpointProject = new pinpoint.CfnApp(this, 'MyCfnApp', {
-    name: 'TestProject1',
-    });
 
     // Retrieve externlaId secret from Secrets Manager
     const externalIdSecret = Secret.fromSecretNameV2(this, 'ExternalId', 'external-Id');
