@@ -56,6 +56,7 @@ export class UserPool extends cdk.Stack {
       },
       lambdaTriggers: {
         preSignUp: lambdaFunction,
+        postAuthentication: cognitoPostAuthPinpointAnalyticsLambda,
       },
     });
 
@@ -203,6 +204,12 @@ export class UserPool extends cdk.Stack {
       value: userPoolId,
       description: 'Userpool for Seiska users',
       exportName: `${exportPrefixResolved}-seiska-test-userpool`,
+    });
+
+    new CfnOutput (this, 'seiska-userpool-pinpoint-project', {
+      value: pinpointProject.attrArn,
+      description: 'Pinpoint project for Seiska user pool',
+      exportName: `${exportPrefixResolved}-seiska-userpool-pinpoint-projectArn`,
     });
   }
 }

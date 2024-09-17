@@ -50,16 +50,36 @@ export class KinesisFirehoseStream extends Stack {
     const firehostDliverySteram = new firehose.CfnDeliveryStream(this, 'FirehoseDeliveryStream', {
       deliveryStreamName: 'Test-Firehose-delivery-stream',
       deliveryStreamType: "KinesisStreamAsSource",
-      extendedS3DestinationConfiguration: {
-        bucketArn: bucket.bucketArn,
+      // extendedS3DestinationConfiguration: {
+      //   bucketArn: bucket.bucketArn,
+      //   roleArn: firehoseRole.roleArn,
+      //   prefix: 'raw/',
+      //   // bufferingHints: {
+      //   //   intervalInSeconds: 60,
+      //   //   sizeInMBs: 128,
+      //   // },
+      //   // compressionFormat: 'GZIP',
+      //   errorOutputPrefix: 'error/',
+      // },
+      redshiftDestinationConfiguration: {
         roleArn: firehoseRole.roleArn,
-        prefix: 'raw/',
+        clusterJdbcurl: 'jdbc:redshift://test-redshift-workgroup.124768067502.eu-west-1.redshift-serverless.amazonaws.com:5432/dev',
+        copyCommand: {
+          dataTableName: 'test',
+        },
+        username: 'admin',
+        password: 'Ishworkhadka123',
+        s3Configuration: {
+          bucketArn: bucket.bucketArn,
+          roleArn: firehoseRole.roleArn,
+          prefix: 'raw-data/',
         // bufferingHints: {
         //   intervalInSeconds: 60,
         //   sizeInMBs: 128,
         // },
         // compressionFormat: 'GZIP',
-        errorOutputPrefix: 'error/',
+        // errorOutputPrefix: 'error/',
+        },
       },
       kinesisStreamSourceConfiguration: {
         kinesisStreamArn: dataStream.streamArn,
