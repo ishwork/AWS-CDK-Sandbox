@@ -86,9 +86,18 @@ export class DataCollectionApi extends Stack {
           type: JsonSchemaType.OBJECT,
           properties: {
             category: { type: JsonSchemaType.STRING },
-            timestamp: { type: JsonSchemaType.STRING },
+            data: {
+              type: [
+                JsonSchemaType.ARRAY,
+                JsonSchemaType.BOOLEAN,
+                JsonSchemaType.INTEGER,
+                JsonSchemaType.NUMBER,
+                JsonSchemaType.OBJECT,
+                JsonSchemaType.STRING,
+              ],
+            },
           },
-          required: ['category', 'timestamp'],
+          required: ['category', 'data'],
         },
       },
     });

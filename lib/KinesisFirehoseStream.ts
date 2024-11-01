@@ -3,6 +3,7 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import * as kinesis from 'aws-cdk-lib/aws-kinesis';
 import * as firehose from 'aws-cdk-lib/aws-kinesisfirehose';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Role, ServicePrincipal, Policy, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';
 
 export class KinesisFirehoseStream extends Stack {
@@ -46,6 +47,38 @@ export class KinesisFirehoseStream extends Stack {
     dataStream.grantRead(firehoseRole);
     dataStream.grant(firehoseRole, 'kinesis:DescribeStream');
 
+    // Create the Lambda function to process data for Firehose
+    const lambdaFunction = new lambda.Function(this, 'FirehoseDataProcessor', {
+      functionName: 'Test-FirehoseDataTransformationFunction',
+      runtime: lambda.Runtime.NODEJS_16_X,
+      handler: 'index.handler',
+      code: lambda.Code.fromInline(`
+        exports.handler = async (event) => {
+          const output = event.records.map((record) => {
+            const payload = Buffer.from(record.data, 'base64').toString('utf-8');
+            let singleLineJson;
+            try {
+              const parsedData = JSON.parse(payload);
+              singleLineJson = JSON.stringify(parsedData);
+            } catch (error) {
+              console.error('Error parsing JSON:', error);
+              singleLineJson = JSON.stringify({ error: 'Invalid JSON format' });
+            }
+            const transformedData = Buffer.from(singleLineJson).toString('base64');
+            return {
+              recordId: record.recordId,
+              result: 'Ok',
+              data: transformedData,
+            };
+          });
+          return { records: output };
+        };
+      `),
+    });
+
+    // Grant Firehose Role permission to invoke the Lambda function
+    lambdaFunction.grantInvoke(firehoseRole);
+
     // Create the Kinesis Data Firehose delivery stream
     const firehostDliverySteram = new firehose.CfnDeliveryStream(this, 'FirehoseDeliveryStream', {
       deliveryStreamName: 'Test-Firehose-delivery-stream',
@@ -63,9 +96,9 @@ export class KinesisFirehoseStream extends Stack {
       // },
       redshiftDestinationConfiguration: {
         roleArn: firehoseRole.roleArn,
-        clusterJdbcurl: 'jdbc:redshift://test-redshift-workgroup.124768067502.eu-west-1.redshift-serverless.amazonaws.com:5432/dev',
+        clusterJdbcurl: 'jdbc:redshift://fi-seiska-data-workgroup.124768067502.eu-west-1.redshift-serverless.amazonaws.com:5439/dev',
         copyCommand: {
-          dataTableName: 'test',
+          dataTableName: 'customers',
         },
         username: 'admin',
         password: 'Ishworkhadka123',
@@ -80,6 +113,20 @@ export class KinesisFirehoseStream extends Stack {
         // compressionFormat: 'GZIP',
         // errorOutputPrefix: 'error/',
         },
+        processingConfiguration: {
+        enabled: true,
+        processors: [
+          {
+            type: 'Lambda',
+            parameters: [
+              {
+                parameterName: 'LambdaArn',
+                parameterValue: lambdaFunction.functionArn, 
+              },
+            ],
+          },
+        ],
+      },
       },
       kinesisStreamSourceConfiguration: {
         kinesisStreamArn: dataStream.streamArn,
@@ -87,5 +134,6 @@ export class KinesisFirehoseStream extends Stack {
       },
     });
     firehostDliverySteram.node.addDependency(firehosePolicy);
+    firehostDliverySteram.node.addDependency(lambdaFunction);
   }
 }
