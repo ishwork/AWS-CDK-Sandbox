@@ -30,7 +30,7 @@ export class UserPool extends cdk.Stack {
     const lambdaFunction = new NodejsFunction(this, 'PreSignUpLambda', {
       runtime: Runtime.NODEJS_16_X,
       handler: 'main',
-      entry: join(__dirname, `../src/LinkProviderToUser.ts`),
+      entry: join(__dirname, `../src/Lambda/LinkProviderToUser.ts`),
     });
 
     // create a lambda function to be used as a post-authentication trigger
@@ -40,7 +40,7 @@ export class UserPool extends cdk.Stack {
       timeout: cdk.Duration.seconds(30),
       runtime: Runtime.NODEJS_18_X,
       handler: 'main',
-      entry: join(__dirname, `../src/CognitoPostAuthPinpointAnalytics.ts`),
+      entry: join(__dirname, `../src/Lambda/CognitoPostAuthPinpointAnalytics.ts`),
       environment: {
         PINPOINT_APP_ID: cdk.SecretValue.secretsManager('Seiska-Userpool-PinpointProjectAppId').unsafeUnwrap(),
       },
