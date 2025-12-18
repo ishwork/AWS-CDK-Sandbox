@@ -4,7 +4,7 @@ import { Construct } from 'constructs';
 import * as sagemaker from 'aws-cdk-lib/aws-sagemaker';
 import { Role, ServicePrincipal, ManagedPolicy } from 'aws-cdk-lib/aws-iam';
 
-export class SagemakerStudioStack extends cdk.Stack {
+export class SagemakerStudio extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 

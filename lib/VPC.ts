@@ -31,7 +31,7 @@ export interface VpcProps {
   revision?: number;
 }
 
-export class VpcTestStack extends cdk.Stack {
+export class VPC extends cdk.Stack {
   public readonly vpc: ec2.Vpc;
 
   constructor(scope: Construct, id: string, props: VpcProps = {}, stackProps?: cdk.StackProps) {
