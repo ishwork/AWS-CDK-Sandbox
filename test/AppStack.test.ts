@@ -1,17 +1,20 @@
-// import * as cdk from 'aws-cdk-lib';
-// import { Template } from 'aws-cdk-lib/assertions';
-// import * as VpcTest from '../lib/vpc-test-stack';
+import * as cdk from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
 
-// example test. To run these tests, uncomment this file along with the
-// example resource in lib/vpc-test-stack.ts
-test('SQS Queue Created', () => {
-//   const app = new cdk.App();
-//     // WHEN
-//   const stack = new VpcTest.VpcTestStack(app, 'MyTestStack');
-//     // THEN
-//   const template = Template.fromStack(stack);
+import { VPC } from '../lib/VPC';
 
-//   template.hasResourceProperties('AWS::SQS::Queue', {
-//     VisibilityTimeout: 300
-//   });
+describe('VPC Construct', () => {
+	test('creates a VPC with the specified CIDR and exportPrefix', () => {
+		const app = new cdk.App();
+		const stack = new cdk.Stack(app, 'TestStack');
+		new VPC(stack, 'TestVPC', {
+			vpcCidr: '10.1.0.0/16',
+			exportPrefix: 'UnitTestVpc',
+		});
+		const template = Template.fromStack(stack);
+		template.resourceCountIs('AWS::EC2::VPC', 1);
+		template.hasResourceProperties('AWS::EC2::VPC', {
+			CidrBlock: '10.1.0.0/16',
+		});
+	});
 });
