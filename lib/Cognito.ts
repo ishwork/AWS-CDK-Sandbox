@@ -18,7 +18,7 @@ export interface CognitoProps {
   exportPrefix?: string;
 }
 
-export class UserPool extends cdk.Stack {
+export class UserPool extends Construct {
   public readonly userPool: cognito.UserPool;
 
   constructor(scope: Construct, id: string, { exportPrefix }: CognitoProps) {

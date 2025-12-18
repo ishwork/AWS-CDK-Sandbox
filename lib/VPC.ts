@@ -31,23 +31,20 @@ export interface VpcProps {
   revision?: number;
 }
 
-export class VPC extends cdk.Stack {
+export class VPC extends Construct {
   public readonly vpc: ec2.Vpc;
 
-  constructor(scope: Construct, id: string, props: VpcProps = {}, stackProps?: cdk.StackProps) {
-    super(scope, id, stackProps);
-    const { exportPrefix } = props;
+  constructor(scope: Construct, id: string, props: VpcProps = {}) {
+    super(scope, id, );
+    const { exportPrefix, vpcCidr } = props;
     const { stackName } = cdk.Stack.of(this);
     const exportPrefixResolved = exportPrefix || stackName;
-
-    // Specify VPC CIDR block
-    const vpcCidr = '10.0.0.0/16';
 
     /**
      * VPC
      */
     const vpc = new CdkVpc(this, "Vpc", {
-      ipAddresses: IpAddresses.cidr(vpcCidr),
+      ipAddresses: IpAddresses.cidr(vpcCidr ?? '10.0.0.0/16'),
       availabilityZones: ["eu-west-1a", "eu-west-1b", "eu-west-1c"],
       subnetConfiguration: [
         {

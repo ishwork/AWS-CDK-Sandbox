@@ -13,9 +13,9 @@ import { AuthorizationType,
   RequestValidator,
   RestApi, } from 'aws-cdk-lib/aws-apigateway';
 
-export class DataCollectionApi extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
-    super(scope, id, props);
+export class DataCollectionApi extends Construct {
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
 
     // const region = props?.env?.region || 'eu-west-1';
 
