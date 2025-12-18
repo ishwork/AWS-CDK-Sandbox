@@ -1,5 +1,3 @@
-# Welcome to your CDK TypeScript project
-
 This project uses AWS CDK with TypeScript to define, manage, and deploy core AWS infrastructure resources via the InfraStack construct for modular, scalable, and maintainable cloud architecture.
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
