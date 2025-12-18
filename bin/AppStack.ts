@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { VPC } from '../lib/VPC';
-import { SagemakerStudio } from '../lib/SageMaker';
-import { UserPool } from '../lib/Cognito';
-import { KinesisFirehoseStream } from '../lib/KinesisFirehoseStream';
+
 import { DataCollectionApi } from '../lib/DataCollectionApi';
-import { SimpleEmailService } from '../lib/SES';
 import { DynamoDB } from '../lib/DynamoDb';
+import { KinesisFirehoseStream } from '../lib/KinesisFirehoseStream';
+import { SagemakerStudio } from '../lib/SageMaker';
+import { SimpleEmailService } from '../lib/SES';
+import { UserPool } from '../lib/Cognito';
+import { VPC } from '../lib/VPC';
 
 const app = new cdk.App();
 new DynamoDB(app, 'TestDynamoDB', { exportPrefix: 'CustomerData' }, {
