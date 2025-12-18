@@ -6,11 +6,11 @@ import * as firehose from 'aws-cdk-lib/aws-kinesisfirehose';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Role, ServicePrincipal, Policy, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';
 
-export class KinesisFirehoseStream extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
-    super(scope, id, props);
+export class KinesisFirehoseStream extends Construct {
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
 
-    // const region = props?.env?.region || 'eu-west-1';
+    // const region = 'eu-west-1';
 
     const bucketArn = 'arn:aws:s3:::ishwor-test-datasource';
 

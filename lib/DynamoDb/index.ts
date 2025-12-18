@@ -11,10 +11,10 @@ type DynamoDBTableProps = {
   exportPrefix?: string;
 };
 
-export class DynamoDB extends cdk.Stack {
+export class DynamoDB extends Construct {
   public readonly table: dynamodb.Table;
-  constructor(scope: Construct, id: string, props: DynamoDBTableProps = {}, stackProps?: cdk.StackProps) {
-    super(scope, id, stackProps);
+  constructor(scope: Construct, id: string, props: DynamoDBTableProps = {}) {
+    super(scope, id);
 
     const { exportPrefix } = props;
     const { stackName } = Stack.of(this);

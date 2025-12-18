@@ -1,14 +1,13 @@
-import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
 import * as sagemaker from 'aws-cdk-lib/aws-sagemaker';
 import { Role, ServicePrincipal, ManagedPolicy } from 'aws-cdk-lib/aws-iam';
 
-export class SagemakerStudio extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
-    super(scope, id, props);
+export class SagemakerStudio extends Construct {
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
 
-    const region = props?.env?.region || 'eu-west-1';
+    const region = 'eu-west-1';
 
     // create a SageMakerExecutionRole-${region}-cdk for the SageMaker Studio
     let sagemakerExecutionRole = new Role(this, 'SageMakerExecutionRole', {
