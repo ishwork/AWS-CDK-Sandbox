@@ -1,6 +1,6 @@
 # Welcome to your CDK TypeScript project
 
-This is a blank project for CDK development with TypeScript.
+This project uses AWS CDK with TypeScript to define, manage, and deploy core AWS infrastructure resources via the InfraStack construct for modular, scalable, and maintainable cloud architecture.
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
@@ -27,3 +27,10 @@ To provide AWS credentials for your CDK app or SDK usage, follow these steps:
 3. Enter your AWS Access Key ID, Secret Access Key, default region (e.g., eu-west-1), and output format (e.g., json) when prompted.
 
 This will save credentials in `~/.aws/credentials` and configuration in `~/.aws/config`, which are automatically used by the AWS SDK and CDK CLI.
+
+## About InfraStack
+
+- Centralizes and manages core AWS infrastructure resources for this project using AWS CDK.
+- Provisions foundational services such as VPC, Cognito, DynamoDB, Kinesis Firehose, SageMaker, SES, and other shared components.
+- Promotes a modular and maintainable infrastructure codebase.
+- Streamlines deployment and improves resource management.
