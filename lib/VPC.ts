@@ -9,8 +9,7 @@ import {
 
 export interface VpcProps {
   /**
-   * The CIDR range to use for the VPC, e.g. '10.150.0.0/23'.
-   *
+   * Configurable via props; defaults to '10.0.0.0/16' if not provided.
    * Should be a minimum of /28 and maximum size of /16. The range will be split across all
    * subnets per Availability Zone.
    */
