@@ -34,9 +34,9 @@ export interface VpcProps {
 export class VpcTestStack extends cdk.Stack {
   public readonly vpc: ec2.Vpc;
 
-  constructor(scope: Construct, id: string, { exportPrefix }: VpcProps) {
-    super(scope, id);
-
+  constructor(scope: Construct, id: string, props: VpcProps = {}, stackProps?: cdk.StackProps) {
+    super(scope, id, stackProps);
+    const { exportPrefix } = props;
     const { stackName } = cdk.Stack.of(this);
     const exportPrefixResolved = exportPrefix || stackName;
 

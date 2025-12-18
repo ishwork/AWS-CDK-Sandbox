@@ -9,23 +9,15 @@ import { DataCollectionApi } from '../lib/DataCollectionApi';
 import { SimpleEmailService } from '../lib/SES';
 
 const app = new cdk.App();
-// new VpcTestStack(app, 'VpcTestStack', {});
+new VpcTestStack(app, 'VpcTestStack', { exportPrefix: 'VpcTest' }, {
+/* Uncomment the next line if you know exactly what Account and Region you want to deploy the stack to. */
+/* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
+    env: { account: process.env.AWS_ACCOUNT_ID, region: process.env.AWS_REGION }
+});
 // new UserPool(app, 'UserPool', {});
-new KinesisFirehoseStream(app, 'Test-KinesisFirehoseStream', {});
+// new KinesisFirehoseStream(app, 'Test-KinesisFirehoseStream', {});
 // new DataCollectionApi(app, 'DataCollectionApi', {});
 // new SimpleEmailService(app, 'TestSimpleEmailService', {});
-// new SagemakerStudioStack(app, 'SageMakerStack', {
-//   /* If you don't specify 'env', this stack will be environment-agnostic.
-//    * Account/Region-dependent features and context lookups will not work,
-//    * but a single synthesized template can be deployed anywhere. */
-
-//   /* Uncomment the next line to specialize this stack for the AWS Account
-//    * and Region that are implied by the current CLI configuration. */
-//   // env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
-
-//   /* Uncomment the next line if you know exactly what Account and Region you
-//    * want to deploy the stack to. */
-//   env: { account: '124768067502', region: 'eu-west-1' },
-
-//   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
+// new SagemakerStudioStack(app, 'SagemakerStudioStack', {
+//     env: { account: process.env.AWS_ACCOUNT_ID, region: process.env.AWS_REGION }
 // });
