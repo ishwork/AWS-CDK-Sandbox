@@ -16,6 +16,8 @@ export class InfraStack extends Stack {
     // Define VPC
     new VPC(this, 'VPC', {
         exportPrefix: 'TestVpc',
+        vpcCidr: '10.0.0.0/16', // Specify VPC CIDR block
+        revision: 1,
     });
     // Define DynamoDB
     new DynamoDB(this, 'DynamoDB', {
