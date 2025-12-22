@@ -28,7 +28,7 @@ export class UserPool extends Construct {
     const exportPrefixResolved = exportPrefix || stackName;
 
     const lambdaFunction = new NodejsFunction(this, 'PreSignUpLambda', {
-      runtime: Runtime.NODEJS_16_X,
+      runtime: Runtime.NODEJS_20_X,
       handler: 'main',
       entry: join(__dirname, `../src/Lambda/LinkProviderToUser.ts`),
     });

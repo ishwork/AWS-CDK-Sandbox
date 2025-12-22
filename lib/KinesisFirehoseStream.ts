@@ -50,7 +50,7 @@ export class KinesisFirehoseStream extends Construct {
     // Create the Lambda function to process data for Firehose
     const lambdaFunction = new lambda.Function(this, 'FirehoseDataProcessor', {
       functionName: 'Test-FirehoseDataTransformationFunction',
-      runtime: lambda.Runtime.NODEJS_16_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       code: lambda.Code.fromInline(`
         exports.handler = async (event) => {
