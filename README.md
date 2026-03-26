@@ -1,4 +1,4 @@
-This project uses AWS CDK with TypeScript to define, manage, and deploy core AWS infrastructure resources via the InfraStack construct for modular, scalable, and maintainable cloud architecture.
+This project uses AWS CDK with TypeScript to define, manage, and deploy core AWS infrastructure resources. It includes an `InfraStack` for provisioning AWS services and a `PipelineStack` that automates deployments via AWS CodePipeline, enabling a fully self-mutating CI/CD pipeline triggered from GitHub.
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
@@ -32,3 +32,27 @@ This will save credentials in `~/.aws/credentials` and configuration in `~/.aws/
 - Provisions foundational services such as VPC, Cognito, DynamoDB, Kinesis Firehose, SageMaker, SES, and other shared components.
 - Promotes a modular and maintainable infrastructure codebase.
 - Streamlines deployment and improves resource management.
+
+## About PipelineStack
+
+- Provisions an AWS CodePipeline that automates the build and deployment of `InfraStack` to the `Prod` environment.
+- Pulls source code from GitHub (`master` branch) using an OAuth token stored securely in AWS Secrets Manager.
+- Runs a CodeBuild Synth action (`npm ci`, `npm run build`, `npx cdk synth`) to produce the CDK cloud assembly on every push.
+- Deploys `InfraStack` as a `Prod` stage via CDK Pipelines, keeping infrastructure changes automated.
+- Supports `selfMutation` — the pipeline automatically updates its own definition when pipeline code changes are merged, with no manual redeployment needed.
+
+### Prerequisites
+
+Before deploying `PipelineStack`, ensure the following are in place:
+
+1. **Bootstrap the target environment:**
+   ```sh
+   cdk bootstrap aws://<account-id>/<region>
+   ```
+
+2. **Store your GitHub personal access token in Secrets Manager** 
+
+3. **Deploy the pipeline** (one-time manual deploy; self-mutation takes over after):
+   ```sh
+   cdk deploy PipelineStack
+   ```
