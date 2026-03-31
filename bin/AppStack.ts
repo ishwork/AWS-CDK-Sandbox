@@ -6,5 +6,5 @@ import { PipelineStack } from '@/lib/PipelineStack';
 
 const app = new cdk.App();
 new PipelineStack(app, 'PipelineStack', {
-    env: { account: process.env.AWS_ACCOUNT_ID, region: process.env.AWS_REGION },
+  env: { account: process.env.AWS_ACCOUNT_ID, region: process.env.AWS_REGION },
 });

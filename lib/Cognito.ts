@@ -5,7 +5,17 @@ import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
-import { CfnServiceLinkedRole, Role, ServicePrincipal, Policy, PolicyStatement, Effect, PolicyDocument, CfnPolicy, ManagedPolicy  } from 'aws-cdk-lib/aws-iam';
+import {
+  CfnServiceLinkedRole,
+  Role,
+  ServicePrincipal,
+  Policy,
+  PolicyStatement,
+  Effect,
+  PolicyDocument,
+  CfnPolicy,
+  ManagedPolicy,
+} from 'aws-cdk-lib/aws-iam';
 import { aws_pinpoint as pinpoint } from 'aws-cdk-lib';
 import { join } from 'path';
 
@@ -24,7 +34,7 @@ export class UserPool extends Construct {
   constructor(scope: Construct, id: string, { exportPrefix }: CognitoProps) {
     super(scope, id);
 
-     const { stackName } = cdk.Stack.of(this);
+    const { stackName } = cdk.Stack.of(this);
     const exportPrefixResolved = exportPrefix || stackName;
 
     const lambdaFunction = new NodejsFunction(this, 'PreSignUpLambda', {
@@ -34,24 +44,29 @@ export class UserPool extends Construct {
     });
 
     // create a lambda function to be used as a post-authentication trigger
-    const cognitoPostAuthPinpointAnalyticsLambda = new NodejsFunction(this, 'CognitoPostAuthPinpointAnalytics', {
-      functionName: 'Test-CognitoPostAuthPinpointAnalyticsLambda',
-      memorySize: 256,
-      timeout: cdk.Duration.seconds(30),
-      runtime: Runtime.NODEJS_18_X,
-      handler: 'main',
-      entry: join(__dirname, `../src/Lambda/CognitoPostAuthPinpointAnalytics.ts`),
-      environment: {
-        PINPOINT_APP_ID: cdk.SecretValue.secretsManager('Seiska-Userpool-PinpointProjectAppId').unsafeUnwrap(),
+    const cognitoPostAuthPinpointAnalyticsLambda = new NodejsFunction(
+      this,
+      'CognitoPostAuthPinpointAnalytics',
+      {
+        functionName: 'Test-CognitoPostAuthPinpointAnalyticsLambda',
+        memorySize: 256,
+        timeout: cdk.Duration.seconds(30),
+        runtime: Runtime.NODEJS_18_X,
+        handler: 'main',
+        entry: join(__dirname, `../src/Lambda/CognitoPostAuthPinpointAnalytics.ts`),
+        environment: {
+          PINPOINT_APP_ID: cdk.SecretValue.secretsManager(
+            'Seiska-Userpool-PinpointProjectAppId',
+          ).unsafeUnwrap(),
+        },
       },
-    });
-
+    );
 
     const userPool = new cognito.UserPool(this, 'seiska', {
       deletionProtection: true,
       userPoolName: 'seiska',
       customAttributes: {
-        postal_code: new cognito.NumberAttribute({ mutable: true}),
+        postal_code: new cognito.NumberAttribute({ mutable: true }),
         terms_accepted: new cognito.BooleanAttribute({ mutable: true }),
       },
       lambdaTriggers: {
@@ -62,29 +77,33 @@ export class UserPool extends Construct {
 
     // Create a Pinpoint project
     const pinpointProject = new pinpoint.CfnApp(this, 'MyCfnApp', {
-    name: 'TestProject1',
+      name: 'TestProject1',
     });
 
     // Attach inline policy to the lambda function
-    lambdaFunction.role!.attachInlinePolicy(new Policy(this, 'LambdaPolicy', {
-      statements: [
-        new PolicyStatement({
-          effect: Effect.ALLOW,
-          actions: ['cognito-idp:adminLinkProviderForUser', 'cognito-idp:ListUsers'],
-          resources: [userPool.userPoolArn],
-        }),
-      ],
-    }));
+    lambdaFunction.role!.attachInlinePolicy(
+      new Policy(this, 'LambdaPolicy', {
+        statements: [
+          new PolicyStatement({
+            effect: Effect.ALLOW,
+            actions: ['cognito-idp:adminLinkProviderForUser', 'cognito-idp:ListUsers'],
+            resources: [userPool.userPoolArn],
+          }),
+        ],
+      }),
+    );
 
-    cognitoPostAuthPinpointAnalyticsLambda.role!.attachInlinePolicy(new Policy (this, 'pinpoint-policy', {
-      statements: [
-        new PolicyStatement({
-          effect: Effect.ALLOW,
-          actions: ['mobiletargeting:UpdateEndpoint', 'mobiletargeting:PutEvents'],
-          resources: [`${pinpointProject.attrArn}/*`],
-        }),
-      ],
-    }));
+    cognitoPostAuthPinpointAnalyticsLambda.role!.attachInlinePolicy(
+      new Policy(this, 'pinpoint-policy', {
+        statements: [
+          new PolicyStatement({
+            effect: Effect.ALLOW,
+            actions: ['mobiletargeting:UpdateEndpoint', 'mobiletargeting:PutEvents'],
+            resources: [`${pinpointProject.attrArn}/*`],
+          }),
+        ],
+      }),
+    );
 
     // userPool.addTrigger(cognito.UserPoolOperation.PRE_SIGN_UP, lambdaFunction);
 
@@ -121,7 +140,7 @@ export class UserPool extends Construct {
       'website',
       'zoneinfo',
       'custom:postal_code',
-      'custom:terms_accepted'
+      'custom:terms_accepted',
     ];
 
     const standardCognitoReadAttributes = [
@@ -155,7 +174,7 @@ export class UserPool extends Construct {
       description: 'Custom role for Amazon Cognito to interact with Amazon Pinpoint',
       externalIds: [externalId],
       inlinePolicies: {
-        'Policy': new PolicyDocument({
+        Policy: new PolicyDocument({
           statements: [
             new PolicyStatement({
               effect: Effect.ALLOW,
@@ -172,13 +191,14 @@ export class UserPool extends Construct {
       },
     });
 
-    const analyticsConfigurationProperty: cognito.CfnUserPoolClient.AnalyticsConfigurationProperty = {
-      // applicationArn: pinpointProject.attrArn,
-      applicationId: pinpointProject.ref,
-      externalId: externalId,
-      roleArn: cognitoPinpointRole.roleArn,
-      userDataShared: true,
-    }; 
+    const analyticsConfigurationProperty: cognito.CfnUserPoolClient.AnalyticsConfigurationProperty =
+      {
+        // applicationArn: pinpointProject.attrArn,
+        applicationId: pinpointProject.ref,
+        externalId: externalId,
+        roleArn: cognitoPinpointRole.roleArn,
+        userDataShared: true,
+      };
 
     new cognito.CfnUserPoolClient(this, 'app-client', {
       userPoolId,
@@ -191,10 +211,7 @@ export class UserPool extends Construct {
         'http://localhost:9010/api/auth/callback/cognito',
         'http://localhost:8080/api/auth/callback/cognito',
       ],
-      logoutUrLs: [
-        'http://localhost:9010',
-        'http://localhost:8080',
-      ],
+      logoutUrLs: ['http://localhost:9010', 'http://localhost:8080'],
       readAttributes: standardCognitoReadAttributes,
       writeAttributes: standardCognitoWriteAttributes,
       analyticsConfiguration: analyticsConfigurationProperty,
@@ -206,7 +223,7 @@ export class UserPool extends Construct {
       exportName: `${exportPrefixResolved}-seiska-test-userpool`,
     });
 
-    new CfnOutput (this, 'seiska-userpool-pinpoint-project', {
+    new CfnOutput(this, 'seiska-userpool-pinpoint-project', {
       value: pinpointProject.attrArn,
       description: 'Pinpoint project for Seiska user pool',
       exportName: `${exportPrefixResolved}-seiska-userpool-pinpoint-projectArn`,

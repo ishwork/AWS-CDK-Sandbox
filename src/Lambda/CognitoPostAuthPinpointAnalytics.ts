@@ -6,7 +6,7 @@ type CognitoUserAttributes = {
   sub: string;
   email: string;
   [key: string]: string;
-}
+};
 
 type CognitoEvent = {
   request: {
@@ -15,7 +15,7 @@ type CognitoEvent = {
     clientMetadata?: { [key: string]: string };
   };
   response: {};
-}
+};
 
 // export const getPinpointAppId = async () => {
 //   const secretManager = new SecretsManager({
@@ -27,10 +27,9 @@ type CognitoEvent = {
 // };
 
 export const main = async (event: CognitoEvent) => {
-
   if (!event || !event.request || !event.request.userAttributes) {
-    console.error("Invalid event structure:", JSON.stringify(event));
-    throw new Error("Invalid event structure");
+    console.error('Invalid event structure:', JSON.stringify(event));
+    throw new Error('Invalid event structure');
   }
 
   const userId = event.request.userAttributes.sub;

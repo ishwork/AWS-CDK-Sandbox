@@ -9,30 +9,35 @@ type CognitoEvent = {
     };
   };
   userName: string;
-}
+};
 
-const cognitoIdp = new CognitoIdentityServiceProvider()
+const cognitoIdp = new CognitoIdentityServiceProvider();
 const getUserByEmail = async (userPoolId: string, email: string) => {
- const params = {
-   UserPoolId: userPoolId,
-   Filter: `email = '${email}'`
- }
- return cognitoIdp.listUsers(params).promise();
-}
+  const params = {
+    UserPoolId: userPoolId,
+    Filter: `email = '${email}'`,
+  };
+  return cognitoIdp.listUsers(params).promise();
+};
 
-const linkProviderToUser = async (username: string, userPoolId: string, providerName: string, providerUserId: string) => {
+const linkProviderToUser = async (
+  username: string,
+  userPoolId: string,
+  providerName: string,
+  providerUserId: string,
+) => {
   try {
     const params = {
       DestinationUser: {
         ProviderAttributeValue: username,
-        ProviderName: 'Cognito'
+        ProviderName: 'Cognito',
       },
       SourceUser: {
         ProviderAttributeName: 'Cognito_Subject',
         ProviderAttributeValue: providerUserId,
-        ProviderName: providerName
+        ProviderName: providerName,
       },
-      UserPoolId: userPoolId
+      UserPoolId: userPoolId,
     };
 
     const response = await cognitoIdp.adminLinkProviderForUser(params).promise();
@@ -46,16 +51,30 @@ const linkProviderToUser = async (username: string, userPoolId: string, provider
 export const main = async (event: CognitoEvent) => {
   try {
     if (event.triggerSource === 'PreSignUp_ExternalProvider') {
-      
       // Exclude Microsoft provider and emails with "aller.com" domain from linking
-      if (event.userName.includes('Microsoft') || event.request.userAttributes.email.endsWith('@aller.com')) {
+      if (
+        event.userName.includes('Microsoft') ||
+        event.request.userAttributes.email.endsWith('@aller.com')
+      ) {
         return event;
       }
       // list users by email
-      const usersWithEmail = await getUserByEmail(event.userPoolId, event.request.userAttributes.email);
-      if (usersWithEmail?.Users && usersWithEmail.Users?.length > 0 && usersWithEmail.Users[0].Username) {
-        const [providerName, providerUserId] = event.userName.split('_'); 
-        await linkProviderToUser(usersWithEmail.Users[0].Username, event.userPoolId, providerName, providerUserId);
+      const usersWithEmail = await getUserByEmail(
+        event.userPoolId,
+        event.request.userAttributes.email,
+      );
+      if (
+        usersWithEmail?.Users &&
+        usersWithEmail.Users?.length > 0 &&
+        usersWithEmail.Users[0].Username
+      ) {
+        const [providerName, providerUserId] = event.userName.split('_');
+        await linkProviderToUser(
+          usersWithEmail.Users[0].Username,
+          event.userPoolId,
+          providerName,
+          providerUserId,
+        );
       } else {
         console.log('User not found, skip.');
       }

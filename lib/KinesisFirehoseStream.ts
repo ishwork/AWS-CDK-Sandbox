@@ -24,7 +24,7 @@ export class KinesisFirehoseStream extends Construct {
 
     // Grant permission to read and write to bucket
     bucket.grantReadWrite(firehoseRole);
-    
+
     // Create the Kinesis Data Stream
     const dataStream = new kinesis.Stream(this, 'Test-Kinesis-data-stream', {
       streamName: 'Test-Kinesis-data-stream',
@@ -82,7 +82,7 @@ export class KinesisFirehoseStream extends Construct {
     // Create the Kinesis Data Firehose delivery stream
     const firehostDliverySteram = new firehose.CfnDeliveryStream(this, 'FirehoseDeliveryStream', {
       deliveryStreamName: 'Test-Firehose-delivery-stream',
-      deliveryStreamType: "KinesisStreamAsSource",
+      deliveryStreamType: 'KinesisStreamAsSource',
       // extendedS3DestinationConfiguration: {
       //   bucketArn: bucket.bucketArn,
       //   roleArn: firehoseRole.roleArn,
@@ -96,7 +96,8 @@ export class KinesisFirehoseStream extends Construct {
       // },
       redshiftDestinationConfiguration: {
         roleArn: firehoseRole.roleArn,
-        clusterJdbcurl: 'jdbc:redshift://fi-seiska-data-workgroup.124768067502.eu-west-1.redshift-serverless.amazonaws.com:5439/dev',
+        clusterJdbcurl:
+          'jdbc:redshift://fi-seiska-data-workgroup.124768067502.eu-west-1.redshift-serverless.amazonaws.com:5439/dev',
         copyCommand: {
           dataTableName: 'customers',
         },
@@ -106,27 +107,27 @@ export class KinesisFirehoseStream extends Construct {
           bucketArn: bucket.bucketArn,
           roleArn: firehoseRole.roleArn,
           prefix: 'raw-data/',
-        // bufferingHints: {
-        //   intervalInSeconds: 60,
-        //   sizeInMBs: 128,
-        // },
-        // compressionFormat: 'GZIP',
-        // errorOutputPrefix: 'error/',
+          // bufferingHints: {
+          //   intervalInSeconds: 60,
+          //   sizeInMBs: 128,
+          // },
+          // compressionFormat: 'GZIP',
+          // errorOutputPrefix: 'error/',
         },
         processingConfiguration: {
-        enabled: true,
-        processors: [
-          {
-            type: 'Lambda',
-            parameters: [
-              {
-                parameterName: 'LambdaArn',
-                parameterValue: lambdaFunction.functionArn, 
-              },
-            ],
-          },
-        ],
-      },
+          enabled: true,
+          processors: [
+            {
+              type: 'Lambda',
+              parameters: [
+                {
+                  parameterName: 'LambdaArn',
+                  parameterValue: lambdaFunction.functionArn,
+                },
+              ],
+            },
+          ],
+        },
       },
       kinesisStreamSourceConfiguration: {
         kinesisStreamArn: dataStream.streamArn,

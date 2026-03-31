@@ -30,7 +30,7 @@ export class Pipeline extends Construct {
         commands: ['npm ci', 'npm run build', 'npx cdk synth'],
         primaryOutputDirectory: 'cdk.out',
       }),
-      selfMutation: true
+      selfMutation: true,
     });
   }
 }
