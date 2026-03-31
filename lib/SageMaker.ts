@@ -18,11 +18,11 @@ export class SagemakerStudio extends Construct {
 
     // add AmazonSageMakerFullAccess and AmazonS3FullAccess to the role
     sagemakerExecutionRole.addManagedPolicy(
-      ManagedPolicy.fromAwsManagedPolicyName('AmazonSageMakerFullAccess')
+      ManagedPolicy.fromAwsManagedPolicyName('AmazonSageMakerFullAccess'),
     );
 
     sagemakerExecutionRole.addManagedPolicy(
-      ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess')
+      ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'),
     );
 
     // create a SageMakerUserSettings for the SageMaker Studio

@@ -21,7 +21,7 @@ export class InfraStack extends Stack {
     // });
     // Define DynamoDB
     new DynamoDB(this, 'DynamoDB', {
-        exportPrefix: 'CustomerData',
+      exportPrefix: 'CustomerData',
     });
 
     // Define Cognito User Pool

@@ -1,5 +1,12 @@
 import { Construct } from 'constructs';
-import { EmailIdentity, Identity, ConfigurationSet, CloudWatchDimensionSource, EmailSendingEvent, EventDestination } from 'aws-cdk-lib/aws-ses';
+import {
+  EmailIdentity,
+  Identity,
+  ConfigurationSet,
+  CloudWatchDimensionSource,
+  EmailSendingEvent,
+  EventDestination,
+} from 'aws-cdk-lib/aws-ses';
 
 export class SimpleEmailService extends Construct {
   constructor(scope: Construct, id: string) {
@@ -9,11 +16,20 @@ export class SimpleEmailService extends Construct {
 
     // Create the configuration set
     const configurationSet = new ConfigurationSet(this, 'SESConfigurationSet', {
-      configurationSetName: 'Engagement'
+      configurationSetName: 'Engagement',
     });
 
     // Create the events
-    const emailSendingEvents = [EmailSendingEvent.BOUNCE, EmailSendingEvent.COMPLAINT, EmailSendingEvent.DELIVERY, EmailSendingEvent.OPEN, EmailSendingEvent.CLICK, EmailSendingEvent.RENDERING_FAILURE, EmailSendingEvent.REJECT, EmailSendingEvent.SEND];
+    const emailSendingEvents = [
+      EmailSendingEvent.BOUNCE,
+      EmailSendingEvent.COMPLAINT,
+      EmailSendingEvent.DELIVERY,
+      EmailSendingEvent.OPEN,
+      EmailSendingEvent.CLICK,
+      EmailSendingEvent.RENDERING_FAILURE,
+      EmailSendingEvent.REJECT,
+      EmailSendingEvent.SEND,
+    ];
 
     // Create the event destination
     configurationSet.addEventDestination('CloudWatchDestination', {
@@ -25,7 +41,7 @@ export class SimpleEmailService extends Construct {
           defaultValue: 'unknown_domain',
           name: 'ses:from-domain',
           source: CloudWatchDimensionSource.MESSAGE_TAG,
-        }
+        },
       ]),
     });
 

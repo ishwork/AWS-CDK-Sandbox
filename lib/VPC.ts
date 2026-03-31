@@ -2,10 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
-import {
-  Vpc as CdkVpc,
-  IpAddresses,
-} from "aws-cdk-lib/aws-ec2";
+import { Vpc as CdkVpc, IpAddresses } from 'aws-cdk-lib/aws-ec2';
 
 export interface VpcProps {
   /**
@@ -34,7 +31,7 @@ export class VPC extends Construct {
   public readonly vpc: ec2.Vpc;
 
   constructor(scope: Construct, id: string, props: VpcProps = {}) {
-    super(scope, id, );
+    super(scope, id);
     const { exportPrefix, vpcCidr } = props;
     const { stackName } = cdk.Stack.of(this);
     const exportPrefixResolved = exportPrefix || stackName;
@@ -42,9 +39,9 @@ export class VPC extends Construct {
     /**
      * VPC
      */
-    const vpc = new CdkVpc(this, "Vpc", {
+    const vpc = new CdkVpc(this, 'Vpc', {
       ipAddresses: IpAddresses.cidr(vpcCidr ?? '10.0.0.0/16'),
-      availabilityZones: ["eu-west-1a", "eu-west-1b", "eu-west-1c"],
+      availabilityZones: ['eu-west-1a', 'eu-west-1b', 'eu-west-1c'],
       subnetConfiguration: [
         {
           cidrMask: 26,
@@ -70,17 +67,17 @@ export class VPC extends Construct {
       exportName: `${exportPrefixResolved}-VPCCIDR`,
     });
 
-    new cdk.CfnOutput(this, vpc.publicSubnets[0].node.id, { 
+    new cdk.CfnOutput(this, vpc.publicSubnets[0].node.id, {
       value: vpc.publicSubnets[0].subnetId,
-      exportName: `${exportPrefixResolved}-Subnet1`
+      exportName: `${exportPrefixResolved}-Subnet1`,
     });
-    new cdk.CfnOutput(this, vpc.publicSubnets[1].node.id, { 
+    new cdk.CfnOutput(this, vpc.publicSubnets[1].node.id, {
       value: vpc.publicSubnets[1].subnetId,
-      exportName: `${exportPrefixResolved}-Subnet2`
-     });
-    new cdk.CfnOutput(this, vpc.publicSubnets[2].node.id, { 
+      exportName: `${exportPrefixResolved}-Subnet2`,
+    });
+    new cdk.CfnOutput(this, vpc.publicSubnets[2].node.id, {
       value: vpc.publicSubnets[2].subnetId,
-      exportName: `${exportPrefixResolved}-Subnet3`
+      exportName: `${exportPrefixResolved}-Subnet3`,
     });
   }
 }

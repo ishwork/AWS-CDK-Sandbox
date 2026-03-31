@@ -1,10 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
-import {
-  CfnOutput,
-  Stack,
-  RemovalPolicy,
-  aws_dynamodb as dynamodb,
-} from 'aws-cdk-lib';
+import { CfnOutput, Stack, RemovalPolicy, aws_dynamodb as dynamodb } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 type DynamoDBTableProps = {
@@ -19,7 +14,6 @@ export class DynamoDB extends Construct {
     const { exportPrefix } = props;
     const { stackName } = Stack.of(this);
     const exportPrefixResolved = exportPrefix || stackName;
-
 
     const table = new dynamodb.Table(this, id, {
       partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },

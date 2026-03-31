@@ -3,7 +3,8 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import * as kinesis from 'aws-cdk-lib/aws-kinesis';
 import { Role, ServicePrincipal, Policy, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';
-import { AuthorizationType,
+import {
+  AuthorizationType,
   AwsIntegration,
   Cors,
   EndpointType,
@@ -11,7 +12,8 @@ import { AuthorizationType,
   Model,
   PassthroughBehavior,
   RequestValidator,
-  RestApi, } from 'aws-cdk-lib/aws-apigateway';
+  RestApi,
+} from 'aws-cdk-lib/aws-apigateway';
 
 export class DataCollectionApi extends Construct {
   constructor(scope: Construct, id: string) {
@@ -19,12 +21,13 @@ export class DataCollectionApi extends Construct {
 
     // const region = props?.env?.region || 'eu-west-1';
 
-    const kinesisDataStreamArn = 'arn:aws:kinesis:eu-west-1:124768067502:stream/Test-Kinesis-data-stream';
+    const kinesisDataStreamArn =
+      'arn:aws:kinesis:eu-west-1:124768067502:stream/Test-Kinesis-data-stream';
 
     // Define IAM role for API Gateway
     const dataCollectionApiRole = new Role(this, 'ApiGatewayRole', {
       assumedBy: new ServicePrincipal('apigateway.amazonaws.com'),
-      roleName: 'DataCollectionApiGatewayRole', 
+      roleName: 'DataCollectionApiGatewayRole',
       description: 'Role for API Gateway to access other AWS services',
     });
 
@@ -43,7 +46,11 @@ export class DataCollectionApi extends Construct {
     dataCollectionApiRole.attachInlinePolicy(dataCollectionApiPolicy);
 
     // Get the Kinesis Data Stream by ARN
-    const dataStream = kinesis.Stream.fromStreamArn(this, 'KinesisDataStream', kinesisDataStreamArn);
+    const dataStream = kinesis.Stream.fromStreamArn(
+      this,
+      'KinesisDataStream',
+      kinesisDataStreamArn,
+    );
 
     dataStream.grantWrite(dataCollectionApiRole);
 
@@ -68,7 +75,7 @@ export class DataCollectionApi extends Construct {
     // Define the API Gateway resource
     const dataCollectionResource = dataCoolectionApi.root.addResource('data-collection');
 
-        // Request validator and models
+    // Request validator and models
     const collectionRequestValidator = new RequestValidator(this, 'CollectionRequestValidator', {
       restApi: dataCoolectionApi,
       validateRequestBody: true,
@@ -126,7 +133,7 @@ export class DataCollectionApi extends Construct {
               #end
             ]
           }`,
-        },        
+        },
         integrationResponses: [
           {
             statusCode: '200',
@@ -142,7 +149,6 @@ export class DataCollectionApi extends Construct {
         ],
       },
     });
-
 
     // Define the API Gateway method
     dataCollectionResource.addMethod('POST', apiGatewayKinesisIntegration, {
@@ -161,4 +167,3 @@ export class DataCollectionApi extends Construct {
     });
   }
 }
-
