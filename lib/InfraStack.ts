@@ -1,9 +1,7 @@
 import { Construct } from 'constructs';
 import { Stack, StackProps } from 'aws-cdk-lib';
 
-import { DataCollectionApi } from '@/lib/DataCollectionApi';
 import { DynamoDB } from '@/lib/DynamoDb';
-import { KinesisFirehoseStream } from '@/lib/KinesisFirehoseStream';
 import { SagemakerStudio } from '@/lib/SageMaker';
 import { SimpleEmailService } from '@/lib/SES';
 import { UserPool } from '@/lib/Cognito';
@@ -28,12 +26,6 @@ export class InfraStack extends Stack {
     // new UserPool(this, 'Cognito', {
     //     exportPrefix: 'TestCognito',
     // });
-
-    // Define Data Collection API
-    // new DataCollectionApi(this, 'DataCollectionApi');
-
-    // Define Kinesis Firehose Stream
-    // new KinesisFirehoseStream(this, 'KinesisFirehoseStream');
 
     // Define Simple Email Service
     // new SimpleEmailService(this, 'SimpleEmailService');
