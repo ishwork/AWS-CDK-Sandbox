@@ -1,6 +1,7 @@
 import { Construct } from 'constructs';
 import { Stack, StackProps } from 'aws-cdk-lib';
 
+import { CustomerDataApi } from '@/lib/CustomerDataApi';
 import { DynamoDB } from '@/lib/DynamoDb';
 import { SagemakerStudio } from '@/lib/SageMaker';
 import { SimpleEmailService } from '@/lib/SES';
@@ -17,9 +18,15 @@ export class InfraStack extends Stack {
     //     vpcCidr: '10.0.0.0/16', // Specify VPC CIDR block
     //     revision: 1,
     // });
+
     // Define DynamoDB
-    new DynamoDB(this, 'DynamoDB', {
+    const dynamoDB = new DynamoDB(this, 'DynamoDB', {
       exportPrefix: 'CustomerData',
+    });
+
+    // Define CustomerData API (API Gateway + Lambda -> DynamoDB)
+    new CustomerDataApi(this, 'CustomerDataApi', {
+      table: dynamoDB.table,
     });
 
     // Define Cognito User Pool
