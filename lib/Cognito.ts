@@ -228,5 +228,7 @@ export class UserPool extends Construct {
       description: 'Pinpoint project for Seiska user pool',
       exportName: `${exportPrefixResolved}-seiska-userpool-pinpoint-projectArn`,
     });
+
+    this.userPool = userPool;
   }
 }

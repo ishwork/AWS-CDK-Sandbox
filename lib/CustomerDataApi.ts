@@ -36,7 +36,7 @@ export class CustomerDataApi extends Construct {
 
     table.grantWriteData(customerDataLambda);
 
-    this.api = new RestApi(this, 'CustomerDataApi', {
+    const api = new RestApi(this, 'CustomerDataApi', {
       restApiName: 'CustomerDataApi',
       description: 'API Gateway for customer data submissions',
       endpointConfiguration: {
@@ -55,13 +55,15 @@ export class CustomerDataApi extends Construct {
       },
     });
 
-    const formResource = this.api.root.addResource('form');
+    const formResource = api.root.addResource('form');
     formResource.addMethod('POST', new LambdaIntegration(customerDataLambda));
 
     new CfnOutput(this, 'CustomerDataApiUrl', {
-      value: `${this.api.url}form`,
+      value: `${api.url}form`,
       description: 'Endpoint for submitting customer data',
       exportName: 'CustomerDataApiUrl',
     });
+
+    this.api = api;
   }
 }

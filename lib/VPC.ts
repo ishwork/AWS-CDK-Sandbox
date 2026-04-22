@@ -79,5 +79,7 @@ export class VPC extends Construct {
       value: vpc.publicSubnets[2].subnetId,
       exportName: `${exportPrefixResolved}-Subnet3`,
     });
+
+    this.vpc = vpc;
   }
 }

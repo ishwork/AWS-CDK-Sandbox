@@ -17,7 +17,7 @@ export class Pipeline extends Construct {
 
     const githubBranch = props.githubBranch ?? 'master';
 
-    this.codepipeline = new CodePipeline(this, 'CodePipeline', {
+    const codepipeline = new CodePipeline(this, 'CodePipeline', {
       pipelineName: 'InfraPipeline',
       synth: new ShellStep('Synth', {
         input: CodePipelineSource.gitHub(
@@ -32,5 +32,7 @@ export class Pipeline extends Construct {
       }),
       selfMutation: true,
     });
+
+    this.codepipeline = codepipeline;
   }
 }
